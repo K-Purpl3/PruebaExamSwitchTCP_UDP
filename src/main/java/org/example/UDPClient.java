@@ -29,11 +29,12 @@ public class UDPClient {
                 System.out.println("4. División");
                 System.out.println("5. ¿Es primo?");
                 System.out.println("6. ¿Par o impar?");
+                System.out.println("7. 100 números primos");
+                System.out.println("8. Adivina el número (1-10)");
                 System.out.println("0. Salir");
 
                 option = sc.nextInt();
-
-                String message;
+                String message = "";
 
                 if (option >= 1 && option <= 4) {
                     System.out.print("Numero 1: ");
@@ -47,28 +48,31 @@ public class UDPClient {
                     int n = sc.nextInt();
                     message = option + "#" + n;
 
+                } else if (option == 7) {
+                    message = "7";
+
+                } else if (option == 8) {
+                    System.out.print("Adivina el numero (1-10): ");
+                    int intento = sc.nextInt();
+                    message = "8#" + intento;
+
                 } else if (option == 0) {
-                    message = "0";
+                    break;
                 } else {
                     continue;
                 }
 
-                // Enviar paquete
-                byte[] data = message.getBytes();
                 DatagramPacket packet =
                         new DatagramPacket(
-                                data,
-                                data.length,
+                                message.getBytes(),
+                                message.length(),
                                 serverAddress,
                                 PUERTO
                         );
 
                 socket.send(packet);
 
-                if (option == 0) break;
-
-                // Recibir respuesta
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[2048];
                 DatagramPacket responsePacket =
                         new DatagramPacket(buffer, buffer.length);
 

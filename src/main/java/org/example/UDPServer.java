@@ -2,6 +2,7 @@ package org.example;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Random;
 
 public class UDPServer {
 
@@ -12,10 +13,10 @@ public class UDPServer {
 
             System.out.println("Servidor UDP iniciado...");
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[2048];
 
             while (true) {
-                // Recibir paquete
+
                 DatagramPacket packet =
                         new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
@@ -23,10 +24,6 @@ public class UDPServer {
                 String message = new String(
                         packet.getData(), 0, packet.getLength()
                 );
-
-                if (message.equals("0")) {
-                    continue; // UDP no cierra conexión
-                }
 
                 String[] parts = message.split("#");
                 int option = Integer.parseInt(parts[0]);
@@ -65,11 +62,18 @@ public class UDPServer {
                         result = parImpar(Integer.parseInt(parts[1]));
                         break;
 
+                    case 7:
+                        result = cienNumerosPrimos();
+                        break;
+
+                    case 8:
+                        result = adivinaNumero(Integer.parseInt(parts[1]));
+                        break;
+
                     default:
                         result = "Opción no válida";
                 }
 
-                // Enviar respuesta
                 byte[] response = result.getBytes();
                 DatagramPacket responsePacket =
                         new DatagramPacket(
@@ -87,7 +91,7 @@ public class UDPServer {
         }
     }
 
-    // MÉTODOS DEL SERVIDOR 👇
+    // MÉTODOS 👇
 
     static String suma(int a, int b) {
         return "Resultado suma: " + (a + b);
@@ -108,14 +112,41 @@ public class UDPServer {
 
     static String esPrimo(int n) {
         if (n <= 1) return n + " NO es primo";
-        for (int i = 2; i <= Math.sqrt(n); i++) {
-            if (n % i == 0)
-                return n + " NO es primo";
-        }
+        for (int i = 2; i <= Math.sqrt(n); i++)
+            if (n % i == 0) return n + " NO es primo";
         return n + " ES primo";
     }
 
     static String parImpar(int n) {
         return (n % 2 == 0) ? n + " es PAR" : n + " es IMPAR";
+    }
+
+    // 🆕 OPCIÓN 7
+    static String cienNumerosPrimos() {
+        StringBuilder sb = new StringBuilder("Primos: ");
+        Random r = new Random();
+
+        for (int i = 0; i < 100; i++) {
+            int n = r.nextInt(100) + 1;
+            if (esPrimoSimple(n)) {
+                sb.append(n).append(" ");
+            }
+        }
+        return sb.toString();
+    }
+
+    static boolean esPrimoSimple(int n) {
+        if (n <= 1) return false;
+        for (int i = 2; i <= Math.sqrt(n); i++)
+            if (n % i == 0) return false;
+        return true;
+    }
+
+    // 🆕 OPCIÓN 8
+    static String adivinaNumero(int intento) {
+        int secreto = new Random().nextInt(10) + 1;
+        return (intento == secreto)
+                ? "Correcto ✅ Era " + secreto
+                : "Incorrecto ❌ Era " + secreto;
     }
 }
